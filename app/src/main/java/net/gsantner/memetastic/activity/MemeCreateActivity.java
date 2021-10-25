@@ -606,7 +606,7 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
         allCapsSwitch.setOnCheckedChangeListener((compoundButton, isChecked) -> {
             if (_captionId == 0 || _memeEditorElements.getImageMain().isTextSettingsGlobal()) {
                 _memeEditorElements.getCaption(0).setAllCaps(isChecked);
-            }else if (_captionId != -1 ) {
+            } else if (_captionId != -1) {
                 _memeEditorElements.getCaption(_captionId).setAllCaps(isChecked);
             }
             onMemeEditorObjectChanged();
@@ -688,7 +688,7 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
             case R.id.meme_dialog__color_picker_for_border: {// border color
                 if (_captionId == 0 || _memeEditorElements.getImageMain().isTextSettingsGlobal()) {
                     _memeEditorElements.getCaption(0).setBorderColor(colorInt);
-                }else if (_captionId != -1 ) {
+                } else if (_captionId != -1) {
                     _memeEditorElements.getCaption(_captionId).setBorderColor(colorInt);
                 }
                 View view = _dialogView.findViewById(R.id.meme_dialog__color_picker_for_border);
@@ -698,7 +698,7 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
             case R.id.meme_dialog__color_picker_for_text: {// text background color
                 if (_captionId == 0 || _memeEditorElements.getImageMain().isTextSettingsGlobal()) {
                     _memeEditorElements.getCaption(0).setTextColor(colorInt);
-                }else if (_captionId != -1 ) {
+                } else if (_captionId != -1) {
                     _memeEditorElements.getCaption(_captionId).setTextColor(colorInt);
                 }
                 View view = _dialogView.findViewById(R.id.meme_dialog__color_picker_for_text);
@@ -792,6 +792,9 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
             MemeConfig.Point where = caption.getPositionInCanvas(
                     bitmap.getWidth(), bitmap.getHeight(), textWidth, textHeight);
 
+            // update caption size
+            caption.setCaptionSize(bitmap.getWidth(), bitmap.getHeight(), textWidth, textHeight);
+
             // draw text to the Canvas center
             canvas.save();
             canvas.translate(where.x, where.y);
@@ -818,7 +821,7 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
 
     @OnTextChanged(value = R.id.create_caption, callback = OnTextChanged.Callback.TEXT_CHANGED)
     public void onCaptionChanged(CharSequence text) {
-        if (_captionId != -1 ) {
+        if (_captionId != -1) {
             _memeEditorElements.getCaption(_captionId).setText(text.toString());
         }
         onMemeEditorObjectChanged();
@@ -927,12 +930,12 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 float heightOfPic = view.getMeasuredHeight();
+                float widthOfPic = view.getMeasuredWidth();
                 float heightOfEvent = event.getY();
-
-                int position = (int) (heightOfEvent / heightOfPic * 100);
-
-                _isBottom = position >= 50;
-                _captionId = _memeEditorElements.getCaptionId(new MemeConfig.Point(event.getX(), event.getY()));
+                float widthOfEvent = event.getX();
+                float x = widthOfEvent / widthOfPic;
+                float y = heightOfEvent / heightOfPic;
+                _captionId = _memeEditorElements.getCaptionId(new MemeConfig.Point(x, y));
                 if (_captionId != -1) {
                     MemeEditorElements.EditorCaption caption = _memeEditorElements.getCaptions().get(_captionId);//(new MemeConfig.Point(event.getX(), event.getY()));
                     _editBar.setVisibility(View.VISIBLE);
@@ -948,7 +951,7 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
                     }
                 }
                 break;
-            case MotionEvent.ACTION_MOVE:
+//            case MotionEvent.ACTION_MOVE:
 //                if (_mode == DRAG) {
 //                    float deltaX = curr.x - _last.x;
 //                    float deltaY = curr.y - _last.y;
@@ -960,7 +963,7 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
 //                    fixTrans();
 //                    _last.set(curr.x, curr.y);
 //                }
-                break;
+//                break;
         }
         return super.onTouchEvent(event);
     }

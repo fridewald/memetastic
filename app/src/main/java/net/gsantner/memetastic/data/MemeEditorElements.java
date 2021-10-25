@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.gsantner.memetastic.App.log;
 import static net.gsantner.memetastic.data.MemeConfig.Point;
 
 /**
@@ -38,8 +39,8 @@ public class MemeEditorElements implements Serializable {
 
     public MemeEditorElements(MemeData.Font font, Bitmap image) {
         _captions = new ArrayList<>();
-        _captions.add(new EditorCaption(font, MemeConfig.Caption.TYPE_TOP, new Point((float) 0.5, (float) 0.1), new Point(1, 1)));
-        _captions.add(new EditorCaption(font, MemeConfig.Caption.TYPE_BOTTOM, new Point((float) 0.5, (float) 0.9), new Point(1, 1)));
+        _captions.add(new EditorCaption(font, MemeConfig.Caption.TYPE_TOP, new Point((float) 0.5, (float) 0.05), new Point(1, 0.1f)));
+        _captions.add(new EditorCaption(font, MemeConfig.Caption.TYPE_BOTTOM, new Point((float) 0.5, (float) 0.95), new Point(1, 0.1f)));
         _imageMain = new EditorImage(image);
     }
 
@@ -169,11 +170,14 @@ public class MemeEditorElements implements Serializable {
                     }
                     return new Point(
                             width * point.getX() - textWidth * 0.5f,
-                            height * point.getY() - textHeight * 0.5f);
+                            height * point.getY());
                 }
 //                    return new Point((width - textWidth) * 0.5f, height / 15f);
 //                    return new Point((width - textWidth) * 0.5f, height - textHeight);
             }
+        }
+        public void setCaptionSize(float width, float height, float textWidth, float textHeight){
+            _captionConf.setCaptionSize(new Point(textWidth/width, textHeight/height));
         }
 
         public int getTextColor() {
@@ -228,6 +232,8 @@ public class MemeEditorElements implements Serializable {
             float textHeightStop = captionPoint.getY() + captionSize.getY();
             float textWidthStart = captionPoint.getX() - captionSize.getX() * 0.5f;
             float textWidthStop = captionPoint.getX() + captionSize.getX() * 0.5f;
+            log(String.format("Point is (%.2f, %.2f)", point.getX(), point.getY()));
+            log(String.format("textarea is (%.2f, %.2f) (%.2f, %.2f)", textWidthStart, textHeightStart, textWidthStop, textHeightStop));
             if (point.getX() <= textWidthStop
                     && point.getX() >= textWidthStart
                     && point.getY() >= textHeightStart
@@ -236,6 +242,7 @@ public class MemeEditorElements implements Serializable {
             }
             return false;
         }
+
     }
 
 
