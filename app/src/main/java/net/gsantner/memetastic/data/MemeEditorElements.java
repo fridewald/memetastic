@@ -55,6 +55,10 @@ public class MemeEditorElements implements Serializable {
         return _captions;
     }
 
+    public EditorCaption getCaption(int id) {
+        return _captions.get(id);
+    }
+
     public EditorCaption getCaptionTop() {
         for (EditorCaption caption : _captions) {
             if (caption.getCaptionConf().getPositionType() == MemeConfig.Caption.TYPE_TOP) {
@@ -230,7 +234,7 @@ public class MemeEditorElements implements Serializable {
                     && point.getY() <= textHeightStop) {
                 return true;
             }
-            return true;
+            return false;
         }
     }
 
