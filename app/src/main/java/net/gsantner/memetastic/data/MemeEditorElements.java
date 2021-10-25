@@ -34,12 +34,12 @@ import static net.gsantner.memetastic.data.MemeConfig.Point;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class MemeEditorElements implements Serializable {
     private List<EditorCaption> _captions;
-    private EditorImage _imageMain; // There MUST be always top and bottom caption
+    private EditorImage _imageMain; // There MUST be always top and bottom caption.
 
     public MemeEditorElements(MemeData.Font font, Bitmap image) {
         _captions = new ArrayList<>();
-        _captions.add(new EditorCaption(font, MemeConfig.Caption.TYPE_TOP));
-        _captions.add(new EditorCaption(font, MemeConfig.Caption.TYPE_BOTTOM));
+        _captions.add(new EditorCaption(font, MemeConfig.Caption.TYPE_TOP, new Point((float) 0.5, (float) 0.1), new Point(1, 1)));
+        _captions.add(new EditorCaption(font, MemeConfig.Caption.TYPE_BOTTOM, new Point((float) 0.5, (float) 0.9), new Point(1, 1)));
         _imageMain = new EditorImage(image);
     }
 
@@ -79,6 +79,25 @@ public class MemeEditorElements implements Serializable {
         }
     }
 
+    public EditorCaption pickCaption(Point point) {
+        for (EditorCaption caption : _captions) {
+            if (caption.isPointInside(point)) {
+                return caption;
+            }
+        }
+        return null;
+    }
+
+    public int getCaptionId(Point point) {
+        for (int i=0; i<_captions.size(); i++) {
+            if (_captions.get(i).isPointInside(point)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
     public static class EditorCaption implements Serializable {
         private MemeConfig.Caption _captionConf;
         private MemeData.Font _font = null; // !serializable
@@ -98,6 +117,19 @@ public class MemeEditorElements implements Serializable {
             _captionConf.setText("");
             // end to-do
             _text = _captionConf.getText();
+        }
+
+        public EditorCaption(MemeData.Font font, int positionType, Point point, Point captionSize) {
+            _font = font;
+
+            _captionConf = new MemeConfig.Caption();
+            _captionConf.setPositionType(positionType);
+            _captionConf.setText("");
+            _captionConf.setPosition(point);
+            _captionConf.setCaptionSize(captionSize);
+            // end to-do
+            _text = _captionConf.getText();
+
         }
 
         public EditorCaption(MemeData.Font font, MemeConfig.Caption captionConf) {
@@ -124,6 +156,8 @@ public class MemeEditorElements implements Serializable {
         public Point getPositionInCanvas(float width, float height, float textWidth, float textHeight) {
             switch (_captionConf.getPositionType()) {
                 case MemeConfig.Caption.TYPE_CUSTOM:
+                case MemeConfig.Caption.TYPE_TOP:
+                case MemeConfig.Caption.TYPE_BOTTOM:
                 default: {
                     Point point = _captionConf.getPosition();
                     if (point == null) {
@@ -133,12 +167,8 @@ public class MemeEditorElements implements Serializable {
                             width * point.getX() - textWidth * 0.5f,
                             height * point.getY() - textHeight * 0.5f);
                 }
-
-                case MemeConfig.Caption.TYPE_TOP:
-                    return new Point((width - textWidth) * 0.5f, height / 15f);
-
-                case MemeConfig.Caption.TYPE_BOTTOM:
-                    return new Point((width - textWidth) * 0.5f, height - textHeight);
+//                    return new Point((width - textWidth) * 0.5f, height / 15f);
+//                    return new Point((width - textWidth) * 0.5f, height - textHeight);
             }
         }
 
@@ -185,6 +215,22 @@ public class MemeEditorElements implements Serializable {
 
         public void setImgText(MemeConfig.Caption captionConf) {
             _captionConf = captionConf;
+        }
+
+        public boolean isPointInside(Point point) {
+            Point captionPoint = _captionConf.getPosition();
+            Point captionSize = _captionConf.getCaptionSize();
+            float textHeightStart = captionPoint.getY();
+            float textHeightStop = captionPoint.getY() + captionSize.getY();
+            float textWidthStart = captionPoint.getX() - captionSize.getX() * 0.5f;
+            float textWidthStop = captionPoint.getX() + captionSize.getX() * 0.5f;
+            if (point.getX() <= textWidthStop
+                    && point.getX() >= textWidthStart
+                    && point.getY() >= textHeightStart
+                    && point.getY() <= textHeightStop) {
+                return true;
+            }
+            return true;
         }
     }
 

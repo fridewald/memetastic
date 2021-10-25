@@ -74,6 +74,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:src="@drawable/ic_done_all_black_24dp" />
+
+                <!--                        style="@style/AppTheme.MemeCreatorEditTextOnLightBackground"-->
+                <EditText
+                        android:id="@+id/test_caption"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:hint="@string/enter_caption" />
             </LinearLayout>
 
             <ImageView

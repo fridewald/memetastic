@@ -20,16 +20,8 @@
 #########################################################*/
 package net.gsantner.memetastic.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
+import android.content.*;
+import android.graphics.*;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,12 +39,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.WindowManager;
+import android.view.*;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -134,6 +121,10 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
     @BindView(R.id.memecreate__activity__fullscreen_image)
     TouchImageView _fullscreenImageView;
 
+    @BindView(R.id.test_caption)
+    EditText _test_caption;
+
+
     //#####################
     //## Members
     //#####################
@@ -146,8 +137,15 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
     private Bundle _savedInstanceState = null;
     boolean _bottomContainerVisible = false;
     private boolean _isBottom;
+    private int _captionId;
     private View _dialogView;
     private boolean _savedAsMemeTemplate = false;
+    PointF _last = new PointF();
+    PointF _start = new PointF();
+    static final int NONE = 0;
+    static final int DRAG = 1;
+    static final int ZOOM = 2;
+    int _mode = NONE;
 
     //#####################
     //## Methods
@@ -800,7 +798,7 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
             // get height of multiline text
             int textHeight = textLayout.getHeight();
 
-            // get position of text in the canvas, this will depend in its internal location mode
+            // get position of text in the canvas, this will depend on its internal location mode
             MemeConfig.Point where = caption.getPositionInCanvas(
                     bitmap.getWidth(), bitmap.getHeight(), textWidth, textHeight);
 
@@ -937,30 +935,45 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
         if (_editBar.getVisibility() == View.VISIBLE && !_create_caption.getText().toString().isEmpty()) {
             onMemeEditorObjectChanged();
         }
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            float heightOfPic = view.getMeasuredHeight();
-            float heightOfEvent = event.getY();
+        PointF curr = new PointF(event.getX(), event.getY());
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                float heightOfPic = view.getMeasuredHeight();
+                float heightOfEvent = event.getY();
 
-            int position = (int) (heightOfEvent / heightOfPic * 100);
+                int position = (int) (heightOfEvent / heightOfPic * 100);
 
-            _isBottom = position >= 50;
+                _isBottom = position >= 50;
+                _captionId = _memeEditorElements.getCaptionId(new MemeConfig.Point(event.getX(), event.getY()));
+                if (_captionId != -1) {
+                    MemeEditorElements.EditorCaption caption = _memeEditorElements.getCaptions().get(_captionId);//(new MemeConfig.Point(event.getX(), event.getY()));
+                    _editBar.setVisibility(View.VISIBLE);
+                    String _areaCaption = caption.getText();
 
-            _editBar.setVisibility(View.VISIBLE);
+                    _create_caption.setText(_areaCaption);
+                    _create_caption.requestFocus();
 
-            String _areaCaption = _isBottom ?
-                    _memeEditorElements.getCaptionBottom().getText() :
-                    _memeEditorElements.getCaptionTop().getText();
+                    ActivityUtils.get(this).showSoftKeyboard();
 
-            _create_caption.setText(_areaCaption);
-            _create_caption.requestFocus();
-
-            ActivityUtils.get(this).showSoftKeyboard();
-
-            if (_bottomContainerVisible) {
-                toggleMoarControls(true, false);
-            }
-            return true;
+                    if (_bottomContainerVisible) {
+                        toggleMoarControls(true, false);
+                    }
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+//                if (_mode == DRAG) {
+//                    float deltaX = curr.x - _last.x;
+//                    float deltaY = curr.y - _last.y;
+//                    float fixTransX = getFixDragTrans(deltaX, _viewWidth,
+//                            _origWidth * _saveScale);
+//                    float fixTransY = getFixDragTrans(deltaY, _viewHeight,
+//                            _origHeight * _saveScale);
+//                    matrix.postTranslate(fixTransX, fixTransY);
+//                    fixTrans();
+//                    _last.set(curr.x, curr.y);
+//                }
+                break;
         }
         return super.onTouchEvent(event);
     }
-}
+};
