@@ -39,8 +39,8 @@ public class MemeEditorElements implements Serializable {
 
     public MemeEditorElements(MemeData.Font font, Bitmap image) {
         _captions = new ArrayList<>();
-        _captions.add(new EditorCaption(font, MemeConfig.Caption.TYPE_TOP, new Point((float) 0.5, (float) 0.05), new Point(1, 0.1f)));
-        _captions.add(new EditorCaption(font, MemeConfig.Caption.TYPE_BOTTOM, new Point((float) 0.5, (float) 0.95), new Point(1, 0.1f)));
+        _captions.add(new EditorCaption(font, MemeConfig.Caption.TYPE_TOP, new Point((float) 0.5, (float) 0.05), new Point(0.5f, 0.1f)));
+        _captions.add(new EditorCaption(font, MemeConfig.Caption.TYPE_BOTTOM, new Point((float) 0.5, (float) 0.95), new Point(0.5f, 0.1f)));
         _imageMain = new EditorImage(image);
     }
 
@@ -176,8 +176,15 @@ public class MemeEditorElements implements Serializable {
 //                    return new Point((width - textWidth) * 0.5f, height - textHeight);
             }
         }
-        public void setCaptionSize(float width, float height, float textWidth, float textHeight){
-            _captionConf.setCaptionSize(new Point(textWidth/width, textHeight/height));
+        public void setCaptionSize(float imageWidth, float imageHeight, float textWidth, float textHeight){
+            _captionConf.setCaptionSize(new Point(textWidth/imageWidth, textHeight/imageHeight));
+        }
+
+        public void setCaptionWidth(){
+            _captionConf.getCaptionSize()
+        }
+        public float getCaptionWidth() {
+            return _captionConf.getCaptionSize().x;
         }
 
         public int getTextColor() {

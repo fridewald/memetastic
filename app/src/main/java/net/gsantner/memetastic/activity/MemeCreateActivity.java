@@ -521,6 +521,7 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
 
     private void initTextSettingsPopupDialog(View view) {
         SeekBar textSize = view.findViewById(R.id.meme_dialog__seek_font_size);
+        SeekBar captionSize = view.findViewById(R.id.meme_dialog__seek_caption_size);
         View textBackGroundColor = view.findViewById(R.id.meme_dialog__color_picker_for_text);
         View textBorderColor = view.findViewById(R.id.meme_dialog__color_picker_for_border);
         Switch allCapsSwitch = view.findViewById(R.id.meme_dialog__toggle_all_caps);
@@ -537,10 +538,10 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
 
         allCapsSwitch.setChecked(_memeEditorElements.getCaptionTop().isAllCaps());
         textSize.setProgress(_memeEditorElements.getCaptionTop().getFontSize() - MemeLibConfig.FONT_SIZES.MIN);
+        captionSize.setProgress(_memeEditorElements.getCaptionTop().getCaptionWidth());
 
 
         //listeners
-
         View.OnClickListener colorListeners = view1 -> {
             switch (view1.getId()) {
                 case R.id.meme_dialog__color_picker_for_text:
@@ -598,6 +599,26 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        // captionSize seek
+        captionSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public  void onProgressChanged(SeekBar seekBar, int progess, boolean fromUser){
+                if(_captionId != -1 ){
+                    _memeEditorElements.getCaption(_captionId).setCaptionSize(1,1,1,1);
+                }
+                onMemeEditorObjectChanged();
+            }
+
+            @Override
+            public  void onStartTrackingTouch(SeekBar seekBar){
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar){
 
             }
         });
@@ -777,9 +798,8 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
                 paint.setStyle(Paint.Style.FILL_AND_STROKE);
             }
 
-
             // set text width to canvas width minus 16dp padding
-            int textWidth = canvas.getWidth() - (int) (16 * scale);
+            int textWidth =  (int) (caption.getCaptionWidth() * (canvas.getWidth() - (int) (16 * scale)));
 
             // init StaticLayout for text
             StaticLayout textLayout = new StaticLayout(
@@ -793,7 +813,7 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
                     bitmap.getWidth(), bitmap.getHeight(), textWidth, textHeight);
 
             // update caption size
-            caption.setCaptionSize(bitmap.getWidth(), bitmap.getHeight(), textWidth, textHeight);
+            //caption.setCaptionSize(bitmap.getWidth(), bitmap.getHeight(), textWidth, textHeight);
 
             // draw text to the Canvas center
             canvas.save();
@@ -926,9 +946,9 @@ public class MemeCreateActivity extends AppCompatActivity implements ColorPicker
         if (_editBar.getVisibility() == View.VISIBLE && !_create_caption.getText().toString().isEmpty()) {
             onMemeEditorObjectChanged();
         }
-        PointF curr = new PointF(event.getX(), event.getY());
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                view.getMeasuredState();
                 float heightOfPic = view.getMeasuredHeight();
                 float widthOfPic = view.getMeasuredWidth();
                 float heightOfEvent = event.getY();

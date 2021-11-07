@@ -157,4 +157,27 @@
             android:max="30"
             android:progress="18" />
     </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/default_margin_1"
+            android:gravity="center_vertical"
+            android:weightSum="100">
+
+        <TextView
+                style="@style/AppTheme.MemeCreatorCaptionText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="30"
+                android:text="Caption Size" />
+
+        <SeekBar
+                android:id="@+id/meme_dialog__seek_caption_size"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="70"
+                android:max="30"
+                android:progress="18" />
+    </LinearLayout>
 </LinearLayout>
